@@ -1,0 +1,440 @@
+package view;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import javax.swing.border.*;
+import javax.swing.plaf.basic.BasicButtonUI;
+
+
+public class TelaVagaEstacionamento extends JPanel {
+    
+    private JComboBox<String> jCBFiltro;
+    
+    private JTextField jTFFiltro;
+    
+    private JButton jButtonFiltrar;
+    
+    private JButton jButtonBuscarTodos;
+    
+    private JTable jTableDados;
+    
+    private JPanel jPanelDados;
+    
+    private JTextField jTextFieldId;
+    
+    private JTextField jTextFieldDescricao;
+    
+    private JTextField jTextFieldObs;
+    
+    private JTextField jTextFieldMetragem;
+    
+    private JComboBox<String> jComboBoxStatus;
+    
+    private JPanel jPanelBotoes;
+    
+    private JButton jButtonNovo;
+    
+    private JButton jButtonCancelar;
+    
+    private JButton jButtonGravar;
+    
+    private JButton jButtonSair;
+    
+    
+    public TelaVagaEstacionamento() {
+        setSize(1200, 700);
+        applyTheme();
+        initComponents();
+    }
+  
+    private void initComponents() {
+        setLayout(new BorderLayout(0, 0));
+        
+        add(createHeaderPanel(), BorderLayout.NORTH);
+        
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setDividerLocation(500); 
+        splitPane.setDividerSize(8); 
+        
+        splitPane.setLeftComponent(createBuscaPanel());
+        
+        splitPane.setRightComponent(createFormularioPanel());
+        
+        add(splitPane, BorderLayout.CENTER);
+        
+        add(createBotoesPanel(), BorderLayout.SOUTH);
+    }
+    
+    private JPanel createHeaderPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        
+        panel.setBackground(new Color(230, 126, 34));
+        
+        panel.setBorder(new EmptyBorder(20, 30, 20, 30));
+        
+        JLabel lblTitulo = new JLabel("🅿️ GERENCIAMENTO DE VAGAS");
+        lblTitulo.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
+        lblTitulo.setForeground(Color.WHITE); 
+        
+        panel.add(lblTitulo);
+        
+        return panel;
+    }
+   
+    private JPanel createBuscaPanel() {
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBackground(Color.WHITE);
+        
+        mainPanel.setBorder(new CompoundBorder(
+            new MatteBorder(0, 0, 0, 1, new Color(220, 220, 220)),
+            new EmptyBorder(20, 20, 20, 20) 
+        ));
+        
+        JLabel lblTitulo = new JLabel("🔍 Buscar Vagas");
+        lblTitulo.setFont(new Font("Segoe UI Emoji", Font.BOLD, 18));
+        lblTitulo.setForeground(new Color(52, 73, 94));
+        lblTitulo.setBorder(new EmptyBorder(0, 0, 15, 0));
+        
+     
+        JPanel filtroPanel = new JPanel(new GridBagLayout());
+        filtroPanel.setBackground(Color.WHITE);
+        filtroPanel.setBorder(new EmptyBorder(5, 0, 10, 0));
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5); 
+        gbc.fill = GridBagConstraints.HORIZONTAL; 
+        
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0.0;
+        JLabel lblFiltro = new JLabel("Filtrar por:");
+        lblFiltro.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblFiltro.setForeground(new Color(52, 73, 94));
+        filtroPanel.add(lblFiltro, gbc);
+        
+        gbc.gridx = 1; gbc.weightx = 0.35;
+        jCBFiltro = new JComboBox<>(new String[]{"ID", "Descrição"});
+        jCBFiltro.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        jCBFiltro.setPreferredSize(new Dimension(120, 30));
+        filtroPanel.add(jCBFiltro, gbc);
+        
+        gbc.gridx = 2; gbc.weightx = 0.65;
+        jTFFiltro = new JTextField();
+        jTFFiltro.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        jTFFiltro.setPreferredSize(new Dimension(150, 30));
+        filtroPanel.add(jTFFiltro, gbc);
+        
+        
+        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 2; gbc.weightx = 0.5;
+        jButtonFiltrar = createSmallButton("Filtrar", new Color(230, 126, 34));
+        filtroPanel.add(jButtonFiltrar, gbc);
+        
+        gbc.gridx = 2; gbc.gridwidth = 1; gbc.weightx = 0.5;
+        jButtonBuscarTodos = createSmallButton("Buscar Todos", new Color(211, 84, 0));
+        filtroPanel.add(jButtonBuscarTodos, gbc);
+        
+        
+        String[] colunas = {"ID", "Descrição", "Metragem (m²)", "Status"};
+        
+        DefaultTableModel model = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        jTableDados = new JTable(model);
+        jTableDados.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+        jTableDados.setRowHeight(30); 
+        
+        jTableDados.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 11));
+        jTableDados.getTableHeader().setBackground(new Color(52, 73, 94));
+        jTableDados.getTableHeader().setForeground(Color.WHITE); 
+        
+        jTableDados.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        jTableDados.setSelectionBackground(new Color(230, 126, 34));
+        jTableDados.setSelectionForeground(Color.WHITE);
+        
+        jTableDados.getColumnModel().getColumn(0).setPreferredWidth(40); 
+        jTableDados.getColumnModel().getColumn(1).setPreferredWidth(200); 
+        jTableDados.getColumnModel().getColumn(2).setPreferredWidth(100);
+        jTableDados.getColumnModel().getColumn(3).setPreferredWidth(60);  
+        
+        JScrollPane scrollPane = new JScrollPane(jTableDados);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+        
+        JPanel topPanel = new JPanel(new BorderLayout(0, 10));
+        topPanel.setBackground(Color.WHITE);
+        topPanel.add(lblTitulo, BorderLayout.NORTH);
+        topPanel.add(filtroPanel, BorderLayout.CENTER);
+        
+        mainPanel.add(topPanel, BorderLayout.NORTH);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        
+        return mainPanel;
+    }
+    
+    
+    private JPanel createFormularioPanel() {
+        jPanelDados = new JPanel(new BorderLayout(10, 10));
+        jPanelDados.setBackground(Color.WHITE);
+        jPanelDados.setBorder(new EmptyBorder(20, 20, 20, 20));
+        
+        JLabel lblTitulo = new JLabel("📋 Dados da Vaga");
+        lblTitulo.setFont(new Font("Segoe UI Emoji", Font.BOLD, 18));
+        lblTitulo.setForeground(new Color(52, 73, 94));
+        lblTitulo.setBorder(new EmptyBorder(0, 0, 15, 0));
+        
+        JPanel camposPanel = new JPanel(new GridBagLayout());
+        camposPanel.setBackground(Color.WHITE);
+        camposPanel.setBorder(new EmptyBorder(15, 15, 15, 15));
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        
+        int row = 0;
+        
+        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0.0;
+        camposPanel.add(createLabel("ID:"), gbc);
+        
+        gbc.gridx = 1; gbc.weightx = 0.3;
+        jTextFieldId = new JTextField();
+        jTextFieldId.setEnabled(false);
+        jTextFieldId.setPreferredSize(new Dimension(100, 30));
+        camposPanel.add(jTextFieldId, gbc);
+        
+     
+        row++;
+        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0.0;
+        camposPanel.add(createLabel("* Descrição:"), gbc);
+        
+        gbc.gridx = 1; gbc.gridwidth = 2; gbc.weightx = 1.0;
+        jTextFieldDescricao = new JTextField();
+        jTextFieldDescricao.setPreferredSize(new Dimension(300, 30));
+        camposPanel.add(jTextFieldDescricao, gbc);
+        
+       
+        row++;
+        gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 1; gbc.weightx = 0.0;
+        camposPanel.add(createLabel("Observação:"), gbc);
+        
+        gbc.gridx = 1; gbc.gridwidth = 2; gbc.weightx = 1.0;
+        jTextFieldObs = new JTextField();
+        jTextFieldObs.setPreferredSize(new Dimension(300, 30));
+        camposPanel.add(jTextFieldObs, gbc);
+        
+      
+        row++;
+        gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 1; gbc.weightx = 0.0;
+        camposPanel.add(createLabel("* Metragem (m²):"), gbc);
+        
+        gbc.gridx = 1; gbc.weightx = 0.3;
+        jTextFieldMetragem = new JTextField();
+        jTextFieldMetragem.setPreferredSize(new Dimension(120, 30));
+        camposPanel.add(jTextFieldMetragem, gbc);
+        
+
+        row++;
+        gbc.gridx = 0; gbc.gridy = row; gbc.weightx = 0.0;
+        camposPanel.add(createLabel("Status:"), gbc);
+        
+        gbc.gridx = 1; gbc.weightx = 0.3;
+        jComboBoxStatus = new JComboBox<>(new String[]{"Ativo", "Cancelado"});
+        jComboBoxStatus.setPreferredSize(new Dimension(200, 30));
+        camposPanel.add(jComboBoxStatus, gbc);
+        
+        
+        row++;
+        gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 2;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        camposPanel.add(new JPanel(), gbc);
+        
+        jPanelDados.add(lblTitulo, BorderLayout.NORTH);
+        jPanelDados.add(camposPanel, BorderLayout.CENTER);
+        
+        return jPanelDados;
+    }
+    
+  
+    private JPanel createBotoesPanel() {
+        jPanelBotoes = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
+        jPanelBotoes.setBackground(new Color(236, 240, 241)); // Fundo cinza claro
+        jPanelBotoes.setBorder(new EmptyBorder(10, 20, 10, 20));
+        
+        jButtonNovo = createButton("Novo", new Color(52, 152, 219)); // Azul
+        jButtonNovo.setActionCommand("0");
+        
+        jButtonCancelar = createButton("Cancelar", new Color(149, 165, 166)); // Cinza
+        jButtonCancelar.setActionCommand("1");
+        
+        jButtonGravar = createButton("Gravar", new Color(46, 204, 113)); // Verde
+        jButtonGravar.setActionCommand("1");
+        
+        jButtonSair = createButton("Sair", new Color(231, 76, 60)); // Vermelho
+        jButtonSair.setActionCommand("0");
+        
+        jPanelBotoes.add(jButtonNovo);
+        jPanelBotoes.add(jButtonCancelar);
+        jPanelBotoes.add(jButtonGravar);
+        jPanelBotoes.add(jButtonSair);
+        
+        return jPanelBotoes;
+    }
+    
+    
+    private JLabel createLabel(String texto) {
+        JLabel label = new JLabel(texto);
+        label.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        label.setForeground(new Color(52, 73, 94));
+        return label;
+    }
+
+    private JButton createButton(String texto, Color cor) {
+        JButton button = new JButton(texto) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                g2d.setColor(getBackground());
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                
+                g2d.setColor(getBackground().darker());
+                g2d.setStroke(new BasicStroke(2));
+                g2d.drawRoundRect(1, 1, getWidth() - 2, getHeight() - 2, 8, 8);
+                
+                g2d.dispose();
+                
+                super.paintComponent(g);
+            }
+        };
+        
+        button.setText(texto);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        button.setForeground(Color.WHITE);
+        button.setBackground(cor);
+        
+        button.setUI(new BasicButtonUI());
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setOpaque(false);
+        
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        Dimension size = new Dimension(120, 40);
+        button.setPreferredSize(size);
+        button.setMinimumSize(size);
+        button.setMaximumSize(size);
+        
+        final Color corOriginal = cor;
+        final Color corHover = cor.darker();
+        
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(corHover);
+                button.repaint();
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(corOriginal);
+                button.repaint();
+            }
+        });
+        
+        return button;
+    }
+    
+   
+    private JButton createSmallButton(String texto, Color cor) {
+        JButton button = new JButton(texto) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                g2d.setColor(getBackground());
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 6, 6);
+                
+                g2d.setColor(getBackground().darker());
+                g2d.setStroke(new BasicStroke(2));
+                g2d.drawRoundRect(1, 1, getWidth() - 2, getHeight() - 2, 6, 6);
+                
+                g2d.dispose();
+                super.paintComponent(g);
+            }
+        };
+        
+        button.setText(texto);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 11)); 
+        button.setForeground(Color.WHITE);
+        button.setBackground(cor);
+        
+        button.setUI(new BasicButtonUI());
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setOpaque(false);
+        
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        Dimension size = new Dimension(130, 32);
+        button.setPreferredSize(size);
+        button.setMinimumSize(size);
+        button.setMaximumSize(size);
+        
+        final Color corOriginal = cor;
+        final Color corHover = cor.darker();
+        
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(corHover);
+                button.repaint();
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(corOriginal);
+                button.repaint();
+            }
+        });
+        
+        return button;
+    }
+    
+   
+    private void applyTheme() {
+        try {
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+        } catch (Exception e) {
+            try {
+                UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+            } catch (Exception ex) {
+                try {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                } catch (Exception exc) {
+                    exc.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public JComboBox<String> getjCBFiltro() { return jCBFiltro; }
+    public JTextField getjTFFiltro() { return jTFFiltro; }
+    public JButton getjButtonFiltrar() { return jButtonFiltrar; }
+    public JButton getjButtonBuscarTodos() { return jButtonBuscarTodos; }
+    public JTable getjTableDados() { return jTableDados; }
+    
+    public JPanel getjPanelBotoes() { return jPanelBotoes; }
+    public JButton getjButtonNovo() { return jButtonNovo; }
+    public JButton getjButtonCancelar() { return jButtonCancelar; }
+    public JButton getjButtonGravar() { return jButtonGravar; }
+    public JButton getjButtonSair() { return jButtonSair; }
+    
+    public JPanel getjPanelDados() { return jPanelDados; }
+    public JTextField getjTextFieldId() { return jTextFieldId; }
+    public JTextField getjTextFieldDescricao() { return jTextFieldDescricao; }
+    public JTextField getjTextFieldObs() { return jTextFieldObs; }
+    public JTextField getjTextFieldMetragem() { return jTextFieldMetragem; }
+    public JComboBox<String> getjComboBoxStatus() { return jComboBoxStatus; }
+}
